@@ -1,7 +1,7 @@
 // UserContext.tsx
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from './client'; // Your Supabase client initialization
-import { Session, User } from '@supabase/supabase-js';
+import { User } from '@supabase/supabase-js';
 
 // Define types for the context state
 interface UserContextType {
@@ -21,8 +21,19 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
   // Listen for changes in authentication state
   useEffect(() => {
-    const session: Session | null = supabase.auth.getSession
-    setUser(session?.user ?? null);
+    // Fetch the session asynchronously
+    const fetchSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Error fetching session:', error);
+        setUser(null);
+      } else {
+        setUser(data?.session?.user ?? null);
+      }
+    };
+
+    // Call the function to get the session when the component mounts
+    fetchSession();
 
     // Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -37,7 +48,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
     // Clean up the listener when the component unmounts
     return () => {
-      authListener?.subscription.unsubscribe()
+      authListener?.subscription.unsubscribe();
     };
   }, []);
 
