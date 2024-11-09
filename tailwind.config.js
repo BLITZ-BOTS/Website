@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        lato: ["Lato", "serif"], // Adds "Lato" as a custom font family
+        lato: ["Lato", "serif"],
       },
       colors: {
         'blitz-gradient-left': '#DD2832',
